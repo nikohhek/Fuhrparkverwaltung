@@ -18,9 +18,9 @@
 3. *Jeder Fahrzeugtyp hat spezifische Eigenschaften (PKW: Anzahl der Türen; LKW: Ladekapazität in Tonnen).*
 4. *Eine zentrale Fuhrpark-Klasse soll alle Fahrzeuge in einer Liste verwalten.*
 5. *Über ein einfaches Menü auf der Konsole müssen folgende Aktionen möglich sein:*
- - *Ein neues Fahrzeug (PKW oder LKW) hinzufügen.*
- - *Ein Fahrzeug anhand seines Kennzeichens entfernen.*
- - *Alle Fahrzeuge mit ihren Detaildaten übersichtlich ausgeben.*
+  - *Ein neues Fahrzeug (PKW oder LKW) hinzufügen.*
+  - *Ein Fahrzeug anhand seines Kennzeichens entfernen.*
+  - *Alle Fahrzeuge mit ihren Detaildaten übersichtlich ausgeben.*
 
 *Bitte plant euer Vorgehen selbstständig. Am Ende des Projekts erwarte ich von euch eine Präsentation eurer lauffähigen Anwendung, des zugrundeliegenden Software-Designs (UML-Klassendiagramm) und eurer Projekterfahrungen.*
 
