@@ -13,14 +13,14 @@
 *Eure Aufgabe ist es, einen **ersten Prototyp für eine moderne, konsolenbasierte Fuhrparkverwaltung in Python** zu entwickeln. Ziel ist es, die Machbarkeit einer professionellen Softwarelösung zu demonstrieren und die Geschäftsführung von einer Weiterentwicklung zu überzeugen.*
 
 *Die Kernanforderungen für diesen Prototyp (Minimum Viable Product) sind:*
-*1. Das System muss verschiedene Fahrzeugtypen (mindestens **PKW** und **LKW**) verwalten können.*
-*2. Alle Fahrzeuge haben gemeinsame Daten (Kennzeichen, Hersteller, Modell, Baujahr).*
-*3. Jeder Fahrzeugtyp hat spezifische Eigenschaften (PKW: Anzahl der Türen; LKW: Ladekapazität in Tonnen).*
-*4. Eine zentrale Fuhrpark-Klasse soll alle Fahrzeuge in einer Liste verwalten.*
-*5. Über ein einfaches Menü auf der Konsole müssen folgende Aktionen möglich sein:*
-  *- Ein neues Fahrzeug (PKW oder LKW) hinzufügen.*
-  *- Ein Fahrzeug anhand seines Kennzeichens entfernen.*
-  *- Alle Fahrzeuge mit ihren Detaildaten übersichtlich ausgeben.*
+1. *Das System muss verschiedene Fahrzeugtypen (mindestens **PKW** und **LKW**) verwalten können.*
+2. *Alle Fahrzeuge haben gemeinsame Daten (Kennzeichen, Hersteller, Modell, Baujahr).*
+3. *Jeder Fahrzeugtyp hat spezifische Eigenschaften (PKW: Anzahl der Türen; LKW: Ladekapazität in Tonnen).*
+4. *Eine zentrale Fuhrpark-Klasse soll alle Fahrzeuge in einer Liste verwalten.*
+5. *Über ein einfaches Menü auf der Konsole müssen folgende Aktionen möglich sein:*
+ - *Ein neues Fahrzeug (PKW oder LKW) hinzufügen.*
+ - *Ein Fahrzeug anhand seines Kennzeichens entfernen.*
+ - *Alle Fahrzeuge mit ihren Detaildaten übersichtlich ausgeben.*
 
 *Bitte plant euer Vorgehen selbstständig. Am Ende des Projekts erwarte ich von euch eine Präsentation eurer lauffähigen Anwendung, des zugrundeliegenden Software-Designs (UML-Klassendiagramm) und eurer Projekterfahrungen.*
 
