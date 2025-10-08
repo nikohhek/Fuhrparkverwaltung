@@ -1,7 +1,5 @@
 # Projekt: Fuhrparktverwaltung 1.0
 
-**Contribution by niko**
-
 **Ihr seid Mitarbeiter einer IT-Abteilung des mittelständischen Logistikunternehmens "LogiTrans GmbH". Die aktuelle Situation im Unternehmen ist unbefriedigend: Die Verwaltung des wachsenden Fuhrparks mit über 100 Fahrzeugen (PKWs für den Vertrieb, LKWs für den Transport) erfolgt über eine unübersichtliche und fehleranfällige Excel-Tabelle. Daten sind inkonsistent, die Suche ist umständlich und Auswertungen sind kaum möglich.**
 
 **Der Abteilungsleiter, Herr Krämer, erteilt euch per E-Mail einen klaren Entwicklungsauftrag:**
