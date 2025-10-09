@@ -48,7 +48,25 @@ class Fuhrpark:
     def getFahrzeugDaten(self, kennzeichen: str) -> dict:
         for fahrzeug in self.__fahrzeuge:
             if fahrzeug.getKennzeichen() == kennzeichen:
-                return "Kennzeichen: {}\nHersteller: {}\nModell: {}\nBaujahr: {}\nAnzahl Tühren: {}".format(fahrzeug.getKennzeichen(), fahrzeug.getHersteller(), fahrzeug.getModell(), fahrzeug.getBaujahr(), fahrzeug.getAnzahlTueren())
+                if type(fahrzeug).__name__ == "PKW":
+                    dataDict = {
+                        "kennzeichen": fahrzeug.getKennzeichen(),
+                        "hersteller": fahrzeug.getHersteller(),
+                        "modell": fahrzeug.getModell(),
+                        "baujahr": fahrzeug.getBaujahr(),
+                        "anzahlTueren": fahrzeug.getAnzahlTueren()
+                    }
+                    return dataDict
+                if type(fahrzeug).__name__ == "LKW":
+                    dataDict = {
+                        "kennzeichen": fahrzeug.getKennzeichen(),
+                        "hersteller": fahrzeug.getHersteller(),
+                        "modell": fahrzeug.getModell(),
+                        "baujahr": fahrzeug.getBaujahr(),
+                        "ladekapazitaetKG": fahrzeug.getLadekapazitaetKG()
+                    }
+                    return dataDict
+        return "Kein Fahrzeug mit diesem Kennzeichen registriert."
 
     def addPKW(self, kennzeichen: str, hersteller: str, modell: str, baujahr: int, anzahlTueren: int):
         for fahrzeug in self.__fahrzeuge:
@@ -66,5 +84,7 @@ def main():
     TestFuhrpark.addPKW("SU_SJ_513", "Fiat", "Fullback", 2017, 5)
     TestFuhrpark.addPKW("SU_N_9513", "Merc", "GLB", 2022, 5)
     print(TestFuhrpark.getFahrzeugDaten("SU_N_9513"))
+    print(TestFuhrpark.getFahrzeugDaten("SU_NT_9513"))
+    print(TestFuhrpark.getFahrzeugDaten("SU_SJ_513"))
 
 main()
