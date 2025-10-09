@@ -40,15 +40,18 @@ class Fuhrpark:
     def __init__(self, fahrzeuge: list):
         self.__fahrzeuge = fahrzeuge
 
+    # Gibt Kennzeichen aller Fahrzeuge in Liste aus
     def getFahrzeuge(self) -> list:
         fahrzeugListe = []
         for fahrzeug in self.__fahrzeuge:
             fahrzeugListe.append(fahrzeug.getKennzeichen())
         return fahrzeugListe
 
+    # Gibt Fahrzeugdaten eines Fahrzeugs als Dictionary aus
     def getFahrzeugDaten(self, kennzeichen: str) -> dict:
         for fahrzeug in self.__fahrzeuge:
             if fahrzeug.getKennzeichen() == kennzeichen:
+                # Ausgabe für PKWs
                 if type(fahrzeug).__name__ == "PKW":
                     dataDict = {
                         "typ": "PKW",
@@ -59,6 +62,7 @@ class Fuhrpark:
                         "anzahlTueren": fahrzeug.getAnzahlTueren()
                     }
                     return dataDict
+                # Ausgabe für LKWs
                 if type(fahrzeug).__name__ == "LKW":
                     dataDict = {
                         "typ": "LKW",
@@ -69,6 +73,7 @@ class Fuhrpark:
                         "ladekapazitaetKG": fahrzeug.getLadekapazitaetKG()
                     }
                     return dataDict
+        # Wird nur ausgeführt, wenn Kennzeichen nicht gefunden wurde
         return "Kein Fahrzeug mit diesem Kennzeichen registriert."
 
     def addPKW(self, kennzeichen: str, hersteller: str, modell: str, baujahr: int, anzahlTueren: int):
@@ -91,7 +96,10 @@ class Fuhrpark:
 
 
 def main():
+    # Initiierung von Fuhrpark-Objekt zur Verwaltung
     TestFuhrpark = Fuhrpark([])
+
+    # manuelle Tests
     TestFuhrpark.addPKW("SU_N_9513", "Seat", "Leon", 2002, 5)
     TestFuhrpark.addLKW("SU_SJ_513", "Fiat", "Fullback", 2017, 5)
     TestFuhrpark.addPKW("SU_N_9513", "Merc", "GLB", 2022, 5)
