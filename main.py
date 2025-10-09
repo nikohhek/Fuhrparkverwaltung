@@ -42,9 +42,22 @@ class LKW(Fahrzeug):
         return self.__ladekapazitaetKG
 
 
-def main():
-    Seat = Fahrzeug("SU-N-9513", "Hersteller", "Leon", 2002)
-    print(Seat.getKennzeichen())
+class Fuhrpark:
+    def __init__(self, fahrzeuge: list):
+        self.__fahrzeuge = fahrzeuge
 
+    def getFahrzeuge(self) -> list:
+        return self.__fahrzeuge
+
+    def getFahrzeugDaten(self, kennzeichen: str) -> dict:
+        pass
+
+    def addPKW(self, kennzeichen: str, hersteller: str, modell: str, baujahr: int, anzahlTueren: int):
+        kennzeichen = PKW(kennzeichen, hersteller, modell, baujahr, anzahlTueren)
+
+
+def main():
+    TestFuhrpark = Fuhrpark([])
+    TestFuhrpark.getFahrzeuge()
 
 main()
