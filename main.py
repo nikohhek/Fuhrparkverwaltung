@@ -51,11 +51,11 @@ class Fuhrpark:
                 return "Kennzeichen: {}\nHersteller: {}\nModell: {}\nBaujahr: {}\nAnzahl Tühren: {}".format(fahrzeug.getKennzeichen(), fahrzeug.getHersteller(), fahrzeug.getModell(), fahrzeug.getBaujahr(), fahrzeug.getAnzahlTueren())
 
     def addPKW(self, kennzeichen: str, hersteller: str, modell: str, baujahr: int, anzahlTueren: int):
-        kennzeichen = PKW(kennzeichen, hersteller, modell, baujahr, anzahlTueren)
         for fahrzeug in self.__fahrzeuge:
-            if fahrzeug == kennzeichen:
+            if fahrzeug.getKennzeichen() == kennzeichen:
                 print(f"Fahrzeug mit Kennzeichen {kennzeichen} ist bereits gepflegt.")
-                pass
+                return
+        kennzeichen = PKW(kennzeichen, hersteller, modell, baujahr, anzahlTueren)
         print("Fahrzeug erstellt")
         self.__fahrzeuge.append(kennzeichen)
 
@@ -63,6 +63,8 @@ class Fuhrpark:
 def main():
     TestFuhrpark = Fuhrpark([])
     TestFuhrpark.addPKW("SU_N_9513", "Seat", "Leon", 2002, 5)
+    TestFuhrpark.addPKW("SU_SJ_513", "Fiat", "Fullback", 2017, 5)
+    TestFuhrpark.addPKW("SU_N_9513", "Merc", "GLB", 2022, 5)
     print(TestFuhrpark.getFahrzeugDaten("SU_N_9513"))
 
 main()
