@@ -41,9 +41,10 @@ class Fuhrpark:
         self.__fahrzeuge = fahrzeuge
 
     def getFahrzeuge(self) -> list:
-        #for fahrzeug in self.__fahrzeuge:
-            #print(SU_N_9513.getKennzeichen())
-        return self.__fahrzeuge
+        fahrzeugListe = []
+        for fahrzeug in self.__fahrzeuge:
+            fahrzeugListe.append(fahrzeug.getKennzeichen())
+        return fahrzeugListe
 
     def getFahrzeugDaten(self, kennzeichen: str) -> dict:
         for fahrzeug in self.__fahrzeuge:
@@ -97,5 +98,6 @@ def main():
     print(TestFuhrpark.getFahrzeugDaten("SU_N_9513"))
     print(TestFuhrpark.getFahrzeugDaten("SU_NT_9513"))
     print(TestFuhrpark.getFahrzeugDaten("SU_SJ_513"))
+    print(TestFuhrpark.getFahrzeuge())
 
 main()
