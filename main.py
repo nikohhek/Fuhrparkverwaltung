@@ -41,41 +41,29 @@ class Fuhrpark:
         self.__fahrzeuge = fahrzeuge
 
     # Gibt Kennzeichen aller Fahrzeuge in Liste aus
-    def getFahrzeuge(self) -> list:
-        fahrzeugListe = []
+    def getFahrzeuge(self) -> dict:
+        fahrzeugListe = {
+            "PKW": {},
+            "LKW": {}
+        }
         for fahrzeug in self.__fahrzeuge:
-            fahrzeugListe.append(fahrzeug.getKennzeichen())
+            if type(fahrzeug).__name__ == "PKW":
+                fahrzeugListe["PKW"] = {
+                    "kennzeichen": fahrzeug.getKennzeichen(),
+                    "hersteller": fahrzeug.getHersteller(),
+                    "modell": fahrzeug.getModell(),
+                    "baujahr": fahrzeug.getBaujahr(),
+                    "anzahlTueren": fahrzeug.getAnzahlTueren()
+                }
+            if type(fahrzeug).__name__ == "LKW":
+                fahrzeugListe["LKW"] = {
+                    "kennzeichen": fahrzeug.getKennzeichen(),
+                    "hersteller": fahrzeug.getHersteller(),
+                    "modell": fahrzeug.getModell(),
+                    "baujahr": fahrzeug.getBaujahr(),
+                    "ladekapazitaetKG": fahrzeug.getLadekapazitaetKG()
+                }
         return fahrzeugListe
-
-    # Gibt Fahrzeugdaten eines Fahrzeugs als Dictionary aus
-    def getFahrzeugDaten(self, kennzeichen: str) -> dict:
-        for fahrzeug in self.__fahrzeuge:
-            # Vergleicht Kennzeichen des momentanen Fahrzeugs mit gesuchtem Kennzeichen
-            if fahrzeug.getKennzeichen() == kennzeichen:
-                # Ausgabe für PKWs
-                if type(fahrzeug).__name__ == "PKW":
-                    dataDict = {
-                        "typ": "PKW",
-                        "kennzeichen": fahrzeug.getKennzeichen(),
-                        "hersteller": fahrzeug.getHersteller(),
-                        "modell": fahrzeug.getModell(),
-                        "baujahr": fahrzeug.getBaujahr(),
-                        "anzahlTueren": fahrzeug.getAnzahlTueren()
-                    }
-                    return dataDict
-                # Ausgabe für LKWs
-                if type(fahrzeug).__name__ == "LKW":
-                    dataDict = {
-                        "typ": "LKW",
-                        "kennzeichen": fahrzeug.getKennzeichen(),
-                        "hersteller": fahrzeug.getHersteller(),
-                        "modell": fahrzeug.getModell(),
-                        "baujahr": fahrzeug.getBaujahr(),
-                        "ladekapazitaetKG": fahrzeug.getLadekapazitaetKG()
-                    }
-                    return dataDict
-        # Wird nur ausgeführt, wenn Kennzeichen nicht gefunden wurde
-        return "Kein Fahrzeug mit diesem Kennzeichen registriert."
 
     def addPKW(self, kennzeichen: str, hersteller: str, modell: str, baujahr: int, anzahlTueren: int):
         for fahrzeug in self.__fahrzeuge:
