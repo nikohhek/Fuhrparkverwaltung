@@ -65,23 +65,19 @@ class Fuhrpark:
                 }
         return fahrzeugListe
 
-    def addPKW(self, kennzeichen: str, hersteller: str, modell: str, baujahr: int, anzahlTueren: int):
+    def addFahrzeug(self, fahrzeugtyp: str, kennzeichen: str, hersteller: str, modell: str, baujahr: int, anzahlTueren: int, ladekapazitaetKG: int):
         for fahrzeug in self.__fahrzeuge:
             if fahrzeug.getKennzeichen() == kennzeichen:
                 print(f"Fahrzeug mit Kennzeichen {kennzeichen} ist bereits gepflegt.")
                 return
-        kennzeichen = PKW(kennzeichen, hersteller, modell, baujahr, anzahlTueren)
-        print("Fahrzeug erstellt")
-        self.__fahrzeuge.append(kennzeichen)
-
-    def addLKW(self, kennzeichen: str, hersteller: str, modell: str, baujahr: int, ladekapazitaetKG: int):
-        for fahrzeug in self.__fahrzeuge:
-            if fahrzeug.getKennzeichen() == kennzeichen:
-                print(f"Fahrzeug mit Kennzeichen {kennzeichen} ist bereits gepflegt.")
-                return
-        kennzeichen = LKW(kennzeichen, hersteller, modell, baujahr, ladekapazitaetKG)
-        print("Fahrzeug erstellt")
-        self.__fahrzeuge.append(kennzeichen)
+        if fahrzeugtyp == "PKW":
+            kennzeichen = PKW(kennzeichen, hersteller, modell, baujahr, anzahlTueren)
+            self.__fahrzeuge.append(kennzeichen)
+            print("PKW erstellt")
+        if fahrzeugtyp == "LKW":
+            kennzeichen = LKW(kennzeichen, hersteller, modell, baujahr, ladekapazitaetKG)
+            self.__fahrzeuge.append(kennzeichen)
+            print("LKW erstellt")
 
 
 def main():
@@ -89,12 +85,9 @@ def main():
     TestFuhrpark = Fuhrpark([])
 
     # manuelle Tests
-    TestFuhrpark.addPKW("SU_N_9513", "Seat", "Leon", 2002, 5)
-    TestFuhrpark.addLKW("SU_SJ_513", "Fiat", "Fullback", 2017, 5)
-    TestFuhrpark.addPKW("SU_N_9513", "Merc", "GLB", 2022, 5)
-    print(TestFuhrpark.getFahrzeugDaten("SU_N_9513"))
-    print(TestFuhrpark.getFahrzeugDaten("SU_NT_9513"))
-    print(TestFuhrpark.getFahrzeugDaten("SU_SJ_513"))
+    TestFuhrpark.addFahrzeug("PKW", "SU_N_9513", "Seat", "Leon", 2002, 5, 0)
+    TestFuhrpark.addFahrzeug("LKW", "SU_SJ_513", "Fiat", "Fullback", 2017, 0, 500)
+    TestFuhrpark.addFahrzeug("PKW", "SU_N_9513", "Merc", "GLB", 2022, 5, 0)
     print(TestFuhrpark.getFahrzeuge())
 
 main()
