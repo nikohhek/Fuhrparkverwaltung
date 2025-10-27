@@ -50,6 +50,7 @@ class Fuhrpark:
     # Gibt Fahrzeugdaten eines Fahrzeugs als Dictionary aus
     def getFahrzeugDaten(self, kennzeichen: str) -> dict:
         for fahrzeug in self.__fahrzeuge:
+            # Vergleicht Kennzeichen des momentanen Fahrzeugs mit gesuchtem Kennzeichen
             if fahrzeug.getKennzeichen() == kennzeichen:
                 # Ausgabe für PKWs
                 if type(fahrzeug).__name__ == "PKW":
