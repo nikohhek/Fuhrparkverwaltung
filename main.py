@@ -1,6 +1,8 @@
+from modules import fuhrpark
+
 def main():
     # Initiierung von Fuhrpark-Objekt zur Verwaltung
-    TestFuhrpark = Fuhrpark([])
+    TestFuhrpark = fuhrpark.Fuhrpark([])
 
     # manuelle Tests
     TestFuhrpark.addFahrzeug("PKW", "SU_N_9513", "Seat", "Leon", 2002, 5, 0)
