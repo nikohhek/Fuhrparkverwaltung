@@ -86,7 +86,6 @@ def tui(Fuhrpark):
 def druckeFahrzeuge(Fuhrpark):
     fahrzeugListe = Fuhrpark.getFahrzeuge()
     for kategorie in fahrzeugListe:
-        print(len(fahrzeugListe[kategorie]))
         print(f"\n{20*"="}\n{kategorie}\n{20*"="}")
         for fahrzeug in fahrzeugListe[kategorie]:
             print(f"{fahrzeugListe[kategorie][fahrzeug]}")
@@ -94,10 +93,14 @@ def druckeFahrzeuge(Fuhrpark):
 def main():
     # Initiierung von Fuhrpark-Objekt zur Verwaltung
     Fuhrpark1 = Fuhrpark([])
-    # manuelle Tests
+    # Füge Samples hinzu
     Fuhrpark1.addFahrzeug("PKW", "SU_N_9513", "Seat", "Leon", 2002, 5, 0)
+    Fuhrpark1.addFahrzeug("PKW", "SU_O_9513", "Dacia", "Logan", 2014, 5, 0)
+    Fuhrpark1.addFahrzeug("PKW", "SU_JS_1", "Peugot", "206 CC", 2002, 3, 0)
     Fuhrpark1.addFahrzeug("LKW", "SU_SJ_513", "Fiat", "Fullback", 2017, 0, 500)
-    Fuhrpark1.addFahrzeug("PKW", "SU_N_9513", "Merc", "GLB", 2022, 5, 0)
+    Fuhrpark1.addFahrzeug("LKW", "GM_BN_2", "Mercedes", "Actros", 2017, 0, 5500)
+    Fuhrpark1.addFahrzeug("LKW", "SU_SJ_513", "Fiat", "Fullback", 2017, 0, 500)
+    Fuhrpark1.addFahrzeug("PKW", "SU_N_9513", "Mercedes", "GLB", 2022, 5, 0)
     tui(Fuhrpark1)
 
 if __name__ == "__main__":
