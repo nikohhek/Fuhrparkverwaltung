@@ -104,6 +104,19 @@ def druckeFahrzeuge(Fuhrpark, fenstergroesse: tuple):
 def tui(Fuhrpark):
     fenstergroesse = os.get_terminal_size()
     druckeFahrzeuge(Fuhrpark, fenstergroesse)
+    while True:
+        eingabe = input("\np - PKW hinzufügen\nl - LKW hinzufügen\nq - Programm verlassen\n\nBitte Kommando angeben: ")
+        if eingabe == "p":
+            print("PKW")
+            break
+        elif eingabe == "l":
+            print("LKW")
+            break
+        elif eingabe == "q":
+            return
+        else:
+            print("Ungültige Eingabe. Bitte erneut eingeben.")
+    tui(Fuhrpark)
 
 def main():
     # Initiierung von Fuhrpark-Objekt zur Verwaltung
