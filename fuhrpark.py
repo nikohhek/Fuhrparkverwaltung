@@ -89,33 +89,68 @@ def fmtString(String: str, laenge: int) -> str:
     fmt = str(" " + String + margin * " ")
     return fmt
 
-def druckeFahrzeuge(Fuhrpark, fenstergroesse: tuple):
-    fahrzeugListe = Fuhrpark.getFahrzeuge()
+def eingabeCheck(eingabe: str, typ):
+    while True:
+        try:
+            checked = typ(input(eingabe))
+            if typ == str and checked == "":
+                print("Eingabe leer. Bitte erneut eingeben.")
+            else:
+                break
+        except:
+            print("Ungültige Eingabe. Bitte erneut eingeben.")
+    return checked
+
+def druckeFahrzeuge(Fuhrpark, fahrzeugListe: dict, fenstergroesse: tuple):
+    index = 0
     headline = "Fahrzeuge"
     headlineMargin = int(round(fenstergroesse.columns / 2, 0)) - int(round(len(headline) / 2, 0))
-    print(f"{fenstergroesse.columns * "="}\n{headlineMargin * " "}Fahrzeuge\n{fenstergroesse.columns * "="}")
+    print(f"\n{fenstergroesse.columns * "="}\n{headlineMargin * " "}Fahrzeuge\n{fenstergroesse.columns * "="}")
     # Bezeichnungen Tabelle
     print(f"{fmtString("INDEX", 8)}|{fmtString("TYP", 16)}|{fmtString("KENNZEICHEN", 16)}|{fmtString("HERSTELLER", 16)}|{fmtString("MODELL", 16)}\n{fenstergroesse.columns * "-"}")
     for kategorie in fahrzeugListe:
         for fahrzeug in fahrzeugListe[kategorie]:
-            print(f"{fmtString("", 8)}|{fmtString(kategorie, 16)}|{fmtString(fahrzeugListe[kategorie][fahrzeug]["kennzeichen"], 16)}|{fmtString(fahrzeugListe[kategorie][fahrzeug]["hersteller"], 16)}|{fmtString(fahrzeugListe[kategorie][fahrzeug]["modell"], 16)}")
+            index += 1
+            print(f"{fmtString(index, 8)}|{fmtString(kategorie, 16)}|{fmtString(fahrzeugListe[kategorie][fahrzeug]["kennzeichen"], 16)}|{fmtString(fahrzeugListe[kategorie][fahrzeug]["hersteller"], 16)}|{fmtString(fahrzeugListe[kategorie][fahrzeug]["modell"], 16)}")
 
 # Text User Interface
 def tui(Fuhrpark):
+    fahrzeugListe = Fuhrpark.getFahrzeuge()
     fenstergroesse = os.get_terminal_size()
-    druckeFahrzeuge(Fuhrpark, fenstergroesse)
+    druckeFahrzeuge(Fuhrpark, fahrzeugListe, fenstergroesse)
     while True:
-        eingabe = input("\np - PKW hinzufügen\nl - LKW hinzufügen\nq - Programm verlassen\n\nBitte Kommando angeben: ")
+        eingabe = input("\np - PKW hinzufügen\nl - LKW hinzufügen\nd - Details zu Fahrzeug anzeigen\ni - Details zu Fahrzeug nach Index anzeigen\nq - Programm verlassen\n\nBitte Kommando angeben: ")
         if eingabe == "p":
-            print("PKW")
+            eingabeKennzeichen = eingabeCheck("Bitte Kennzeichen angeben: ", str)
+            eingabeHersteller = eingabeCheck("Bitte Hersteller angeben: ", str)
+            eingabeModell = eingabeCheck("Bitte Modell angeben: ", str)
+            eingabeBaujahr = eingabeCheck("Bitte das Baujahr angeben: ", int)
+            eingabeAnzahlTueren = eingabeCheck("Bitte Anzahl der Türen angeben: ", int)
+            Fuhrpark.addFahrzeug("PKW", eingabeKennzeichen, eingabeHersteller, eingabeModell, eingabeBaujahr, eingabeAnzahlTueren, 0)
             break
         elif eingabe == "l":
-            print("LKW")
+            eingabeKennzeichen = eingabeCheck("Bitte Kennzeichen angeben: ", str)
+            eingabeHersteller = eingabeCheck("Bitte Hersteller angeben: ", str)
+            eingabeModell = eingabeCheck("Bitte Modell angeben: ", str)
+            eingabeBaujahr = eingabeCheck("Bitte das Baujahr angeben: ", int)
+            eingabeLadekapazitaetKG = eingabeCheck("Bitte Ladekapazität in Kilogramm angeben: ", int)
+            Fuhrpark.addFahrzeug("LKW", eingabeKennzeichen, eingabeHersteller, eingabeModell, eingabeBaujahr, 0, eingabeLadekapazitaetKG)
             break
         elif eingabe == "q":
             return
+        elif eingabe == "d":
+            suche = eingabeCheck("Kennzeichen auswählen: ", str)
+            try:
+                print(f"\nTyp: PKW\nKennzeichen: {fahrzeugListe["PKW"][suche]["kennzeichen"]}\nHersteller: {fahrzeugListe["PKW"][suche]["hersteller"]}\nModell: {fahrzeugListe["PKW"][suche]["modell"]}\nBaujahr: {fahrzeugListe["PKW"][suche]["baujahr"]}\nAnzahl der Tühren: {fahrzeugListe["PKW"][suche]["anzahlTueren"]}")
+            except:
+                try:
+                    print(f"\nTyp: LKW\nKennzeichen: {fahrzeugListe["LKW"][suche]["kennzeichen"]}\nHersteller: {fahrzeugListe["LKW"][suche]["hersteller"]}\nModell: {fahrzeugListe["LKW"][suche]["modell"]}\nBaujahr: {fahrzeugListe["LKW"][suche]["baujahr"]}\nLadekapazität: {fahrzeugListe["LKW"][suche]["ladekapazitaetKG"]} kg")
+                except:
+                    print("Kennzeichen nicht gefunden. Bitte Eingabe prüfen.")
+            input("\nDrücke Return um fortzufahren...")
+            break
         else:
-            print("Ungültige Eingabe. Bitte erneut eingeben.")
+            print("Ungültige Eingabe. Bitte erneut eingeben.\n")
     tui(Fuhrpark)
 
 def main():
