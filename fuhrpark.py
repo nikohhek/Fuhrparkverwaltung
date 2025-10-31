@@ -149,6 +149,29 @@ def tui(Fuhrpark):
                     print("Kennzeichen nicht gefunden. Bitte Eingabe prüfen.")
             input("\nDrücke Return um fortzufahren...")
             break
+        elif eingabe == "i":
+            index = 0
+            suche = ""
+            suchNr = eingabeCheck("Index angeben: ", int)
+            for kategorie in fahrzeugListe:
+                for fahrzeug in fahrzeugListe[kategorie]:
+                    index += 1
+                    if index == suchNr:
+                        suche = fahrzeugListe[kategorie][fahrzeug]["kennzeichen"]
+            if suche == "":
+                print("Index nicht gefunden.")
+                input("\nDrücke Return um fortzufahren...")
+                break
+            else:
+                try:
+                    print(f"\nTyp: PKW\nKennzeichen: {fahrzeugListe["PKW"][suche]["kennzeichen"]}\nHersteller: {fahrzeugListe["PKW"][suche]["hersteller"]}\nModell: {fahrzeugListe["PKW"][suche]["modell"]}\nBaujahr: {fahrzeugListe["PKW"][suche]["baujahr"]}\nAnzahl der Tühren: {fahrzeugListe["PKW"][suche]["anzahlTueren"]}")
+                except:
+                    try:
+                        print(f"\nTyp: LKW\nKennzeichen: {fahrzeugListe["LKW"][suche]["kennzeichen"]}\nHersteller: {fahrzeugListe["LKW"][suche]["hersteller"]}\nModell: {fahrzeugListe["LKW"][suche]["modell"]}\nBaujahr: {fahrzeugListe["LKW"][suche]["baujahr"]}\nLadekapazität: {fahrzeugListe["LKW"][suche]["ladekapazitaetKG"]} kg")
+                    except:
+                        print("Kennzeichen nicht gefunden. Bitte Eingabe prüfen.")
+                input("\nDrücke Return um fortzufahren...")
+                break
         else:
             print("Ungültige Eingabe. Bitte erneut eingeben.\n")
     tui(Fuhrpark)
