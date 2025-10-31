@@ -82,6 +82,17 @@ class Fuhrpark:
             self.__fahrzeuge.append(kennzeichen)
             print("LKW erstellt")
 
+    # NEUE FUNKTION: Entfernt ein Fahrzeug anhand des Kennzeichens
+    def removeFahrzeug(self, kennzeichen: str):
+        original_laenge = len(self.__fahrzeuge)
+        # Erstellt eine neue Liste, die alle Fahrzeuge außer dem mit dem gesuchten Kennzeichen enthält
+        self.__fahrzeuge = [fahrzeug for fahrzeug in self.__fahrzeuge if fahrzeug.getKennzeichen().upper() != kennzeichen.upper()]
+        
+        if len(self.__fahrzeuge) < original_laenge:
+            print(f"Fahrzeug mit Kennzeichen {kennzeichen} erfolgreich entfernt.")
+        else:
+            print(f"Fahrzeug mit Kennzeichen {kennzeichen} nicht gefunden.")
+
 
 def fmtString(String: str, laenge: int) -> str:
     String = str(String)
@@ -131,7 +142,8 @@ def tui(Fuhrpark):
     fenstergroesse = os.get_terminal_size()
     druckeFahrzeuge(Fuhrpark, fahrzeugListe, fenstergroesse)
     while True:
-        eingabe = input("\np - PKW hinzufügen\nl - LKW hinzufügen\nd - Details zu Fahrzeug anzeigen\ni - Details zu Fahrzeug nach Index anzeigen\nq - Programm verlassen\n\nBitte Kommando angeben: ")
+        # NEUE OPTION 'r' hinzugefügt
+        eingabe = input("\np - PKW hinzufügen\nl - LKW hinzufügen\nd - Details zu Fahrzeug anzeigen\ni - Details zu Fahrzeug nach Index anzeigen\nr - Fahrzeug entfernen\nq - Programm verlassen\n\nBitte Kommando angeben: ")
         if eingabe == "p":
             eingabeKennzeichen = eingabeCheck("Bitte Kennzeichen angeben: ", str)
             eingabeHersteller = eingabeCheck("Bitte Hersteller angeben: ", str)
@@ -147,6 +159,11 @@ def tui(Fuhrpark):
             eingabeBaujahr = eingabeCheck("Bitte das Baujahr angeben: ", int)
             eingabeLadekapazitaetKG = eingabeCheck("Bitte Ladekapazität in Kilogramm angeben: ", int)
             Fuhrpark.addFahrzeug("LKW", eingabeKennzeichen, eingabeHersteller, eingabeModell, eingabeBaujahr, 0, eingabeLadekapazitaetKG)
+            break
+        elif eingabe == "r": # NEUE LOGIK zum Entfernen
+            eingabeKennzeichen = eingabeCheck("Bitte Kennzeichen des zu entfernenden Fahrzeugs angeben: ", str)
+            Fuhrpark.removeFahrzeug(eingabeKennzeichen)
+            input("\nDrücke Return um fortzufahren...")
             break
         elif eingabe == "q":
             return
