@@ -85,6 +85,18 @@ class Fuhrpark:
 
 def fmtString(String: str, laenge: int) -> str:
     String = str(String)
+    if len(String) > laenge - 1:
+        counter = 0
+        newString = ""
+        for character in String:
+            counter += 1
+            if counter < 12:
+                newString += character
+            elif counter >= 12 and counter < 15:
+                newString += "."
+            else:
+                String = newString
+                break
     margin = int(laenge - round(len(String) , 0) - 1)
     fmt = str(" " + String + margin * " ")
     return fmt
