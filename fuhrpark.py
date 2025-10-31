@@ -1,3 +1,6 @@
+import os
+
+
 class Fahrzeug:
     def __init__(self, kennzeichen: str, hersteller: str, modell: str, baujahr: int):
         self.__kennzeichen = kennzeichen
@@ -79,16 +82,28 @@ class Fuhrpark:
             self.__fahrzeuge.append(kennzeichen)
             print("LKW erstellt")
 
+
+def fmtString(String: str, laenge: int) -> str:
+    String = str(String)
+    margin = int(laenge - round(len(String) , 0) - 1)
+    fmt = str(" " + String + margin * " ")
+    return fmt
+
+def druckeFahrzeuge(Fuhrpark, fenstergroesse: tuple):
+    fahrzeugListe = Fuhrpark.getFahrzeuge()
+    headline = "Fahrzeuge"
+    headlineMargin = int(round(fenstergroesse.columns / 2, 0)) - int(round(len(headline) / 2, 0))
+    print(f"{fenstergroesse.columns * "="}\n{headlineMargin * " "}Fahrzeuge\n{fenstergroesse.columns * "="}")
+    # Bezeichnungen Tabelle
+    print(f"{fmtString("INDEX", 8)}|{fmtString("TYP", 16)}|{fmtString("KENNZEICHEN", 16)}|{fmtString("HERSTELLER", 16)}|{fmtString("MODELL", 16)}\n{fenstergroesse.columns * "-"}")
+    for kategorie in fahrzeugListe:
+        for fahrzeug in fahrzeugListe[kategorie]:
+            print(f"{fmtString("", 8)}|{fmtString(kategorie, 16)}|{fmtString(fahrzeugListe[kategorie][fahrzeug]["kennzeichen"], 16)}|{fmtString(fahrzeugListe[kategorie][fahrzeug]["hersteller"], 16)}|{fmtString(fahrzeugListe[kategorie][fahrzeug]["modell"], 16)}")
+
 # Text User Interface
 def tui(Fuhrpark):
-    druckeFahrzeuge(Fuhrpark)
-
-def druckeFahrzeuge(Fuhrpark):
-    fahrzeugListe = Fuhrpark.getFahrzeuge()
-    for kategorie in fahrzeugListe:
-        print(f"\n{20*"="}\n{kategorie}\n{20*"="}")
-        for fahrzeug in fahrzeugListe[kategorie]:
-            print(f"{fahrzeugListe[kategorie][fahrzeug]}")
+    fenstergroesse = os.get_terminal_size()
+    druckeFahrzeuge(Fuhrpark, fenstergroesse)
 
 def main():
     # Initiierung von Fuhrpark-Objekt zur Verwaltung
