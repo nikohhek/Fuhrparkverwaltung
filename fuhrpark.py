@@ -178,6 +178,7 @@ def tui(Fuhrpark):
             eingabeBaujahr = eingabeCheck("Bitte das Baujahr angeben: ", int)
             eingabeAnzahlTueren = eingabeCheck("Bitte Anzahl der Türen angeben: ", int)
             Fuhrpark.addFahrzeug("PKW", eingabeKennzeichen, eingabeHersteller, eingabeModell, eingabeBaujahr, eingabeAnzahlTueren, 0)
+            Fuhrpark.speichereFuhrpark()
             break
         elif eingabe == "l":
             eingabeKennzeichen = eingabeCheck("Bitte Kennzeichen angeben: ", str)
@@ -186,13 +187,11 @@ def tui(Fuhrpark):
             eingabeBaujahr = eingabeCheck("Bitte das Baujahr angeben: ", int)
             eingabeLadekapazitaetKG = eingabeCheck("Bitte Ladekapazität in Kilogramm angeben: ", int)
             Fuhrpark.addFahrzeug("LKW", eingabeKennzeichen, eingabeHersteller, eingabeModell, eingabeBaujahr, 0, eingabeLadekapazitaetKG)
+            Fuhrpark.speichereFuhrpark()
             break
         elif eingabe == "r":
             eingabeKennzeichen = eingabeCheck("Bitte Kennzeichen des zu entfernenden Fahrzeugs angeben: ", str)
             Fuhrpark.removeFahrzeug(eingabeKennzeichen)
-            input("\nDrücke Return um fortzufahren...")
-            break
-        elif eingabe == "s": # NEUE LOGIK zum Speichern
             Fuhrpark.speichereFuhrpark()
             input("\nDrücke Return um fortzufahren...")
             break
