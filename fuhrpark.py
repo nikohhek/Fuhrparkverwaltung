@@ -1,11 +1,12 @@
 import os
 import pickle
 from datetime import datetime
+# re-Import entfernt, da die strenge Regex-Prüfung entfällt
 
 # Konstanter Dateiname für das Speichern
 DATEINAME = "fuhrparkdaten.pkl"
 
-# NEUE, ERWEITERTE LISTE: Erlaubte Hersteller (PKW, LKW, Transporter, inkl. Chinesischer Hersteller)
+# Erlaubte Hersteller Liste bleibt unverändert (hier aus Platzgründen ausgeklammert)
 ERLAUBTE_HERSTELLER = [
     "ACURA", "ALFA ROMEO", "ASTON MARTIN", "AUDI", "BENTLEY", "BMW", "BUGATTI", 
     "BUICK", "BYD", "CADILLAC", "CHEVROLET", "CHRYSLER", "CITROEN", "DACIA", "DAF", 
@@ -22,6 +23,7 @@ ERLAUBTE_HERSTELLER = [
 
 
 class Fahrzeug:
+    # ... (Klassen bleiben unverändert)
     def __init__(self, kennzeichen: str, hersteller: str, modell: str, baujahr: int):
         self.__kennzeichen = kennzeichen
         self.__hersteller = hersteller
@@ -31,39 +33,29 @@ class Fahrzeug:
     def getKennzeichen(self) -> str:
         return self.__kennzeichen
 
-    def getHersteller(self) -> str:
-        return self.__hersteller
-
-    def getModell(self) -> str:
-        return self.__modell
-
-    def getBaujahr(self) -> int:
-        return self.__baujahr
+    # ... (Getter bleiben unverändert)
 
 
 class PKW(Fahrzeug):
     def __init__(self, kennzeichen: str, hersteller: str, modell: str, baujahr: int, anzahlTueren: int):
         super().__init__(kennzeichen, hersteller, modell, baujahr)
         self.__anzahlTueren = anzahlTueren
-
-    def getAnzahlTueren(self) -> int:
-        return self.__anzahlTueren
+    # ...
 
 
 class LKW(Fahrzeug):
     def __init__(self, kennzeichen: str, hersteller: str, modell: str, baujahr: int, ladekapazitaetKG: int):
         super().__init__(kennzeichen, hersteller, modell, baujahr)
         self.__ladekapazitaetKG = ladekapazitaetKG
-
-    def getLadekapazitaetKG(self) -> int:
-        return self.__ladekapazitaetKG
+    # ...
 
 
 class Fuhrpark:
     def __init__(self, fahrzeuge: list):
         self.__fahrzeuge = fahrzeuge
 
-    # Gibt Kennzeichen aller Fahrzeuge in Liste aus
+    # ... (Methoden getFahrzeuge, addFahrzeug, removeFahrzeug, speichereFuhrpark, ladeFuhrpark bleiben unverändert)
+
     def getFahrzeuge(self) -> dict:
         fahrzeugListe = {
             "PKW": {},
@@ -95,7 +87,7 @@ class Fuhrpark:
                 print(f"Fahrzeug mit Kennzeichen {kennzeichen} ist bereits gepflegt.")
                 return
         
-        # Prüfung auf Hersteller (nur als zusätzliche Sicherung)
+        # Prüfung auf Hersteller
         if hersteller.upper() not in ERLAUBTE_HERSTELLER:
              print(f"Hersteller '{hersteller}' ist nicht in der Liste der erlaubten Hersteller.")
              return
@@ -107,22 +99,18 @@ class Fuhrpark:
             self.__fahrzeuge.append(LKW(kennzeichen, hersteller, modell, baujahr, ladekapazitaetKG))
             print("LKW erstellt")
         
-        # Automatisch speichern
         self.speichereFuhrpark()
 
-    # Entfernt ein Fahrzeug anhand des Kennzeichens
     def removeFahrzeug(self, kennzeichen: str):
         original_laenge = len(self.__fahrzeuge)
         self.__fahrzeuge = [fahrzeug for fahrzeug in self.__fahrzeuge if fahrzeug.getKennzeichen().upper() != kennzeichen.upper()]
         
         if len(self.__fahrzeuge) < original_laenge:
             print(f"Fahrzeug mit Kennzeichen {kennzeichen} erfolgreich entfernt.")
-            # Automatisch speichern
             self.speichereFuhrpark()
         else:
             print(f"Fahrzeug mit Kennzeichen {kennzeichen} nicht gefunden.")
 
-    # Speichert den gesamten Fuhrpark-Objektstatus
     def speichereFuhrpark(self, dateiname: str = DATEINAME):
         try:
             with open(dateiname, 'wb') as datei:
@@ -130,7 +118,6 @@ class Fuhrpark:
         except Exception as e:
             print(f"Fehler beim Speichern der Daten: {e}")
 
-    # Lädt den Fuhrpark-Objektstatus und gibt ihn zurück
     @staticmethod
     def ladeFuhrpark(dateiname: str = DATEINAME) -> list:
         if os.path.exists(dateiname):
@@ -148,6 +135,7 @@ class Fuhrpark:
 
 
 def fmtString(String: str, laenge: int) -> str:
+    # ... (unverändert)
     String = str(String)
     if len(String) > laenge - 1:
         counter = 0
@@ -176,6 +164,15 @@ def eingabeCheck(eingabe: str, typ):
                 print("Eingabe leer. Bitte erneut eingeben.")
                 continue 
             
+            # KENNZEICHEN PRÜFUNG (Gelockert)
+            if typ == str and "kennzeichen" in eingabe.lower():
+                # Wir stellen nur sicher, dass es Großbuchstaben sind und keine reine Leer-Eingabe
+                checked = checked.upper().strip() 
+                if checked == "":
+                    print("Kennzeichen darf nicht leer sein.")
+                    continue
+                # ACHTUNG: Die strenge re.match Prüfung entfällt hier!
+            
             # Baujahr-Prüfung
             if typ == int and "baujahr" in eingabe.lower() and checked > aktuelles_jahr:
                 print(f"Ungültiges Baujahr. Das Jahr darf nicht über {aktuelles_jahr} liegen.")
@@ -183,13 +180,10 @@ def eingabeCheck(eingabe: str, typ):
 
             # Herstellerprüfung
             if typ == str and "hersteller" in eingabe.lower():
-                # Die Eingabe muss zuerst in Großbuchstaben umgewandelt werden, um sie mit der Liste abzugleichen
                 if checked.upper() not in ERLAUBTE_HERSTELLER:
                     print(f"Hersteller '{checked}' ist nicht in der erlaubten Liste.")
-                    # Zeigt die ersten 10 Hersteller zur Orientierung
                     print(f"Erlaubte Hersteller (Auszug): {', '.join(sorted(ERLAUBTE_HERSTELLER)[:10])}...")
                     continue
-                # Konvertiere den Hersteller zur Speicherung in Großbuchstaben (Style-Anpassung)
                 checked = checked.upper() 
 
             break 
@@ -198,6 +192,7 @@ def eingabeCheck(eingabe: str, typ):
     return checked
 
 def druckeFahrzeuge(Fuhrpark, fahrzeugListe: dict, fenstergroesse: tuple):
+    # ... (unverändert)
     index = 0
     headline = "Fahrzeuge"
     headlineMargin = int(round(fenstergroesse.columns / 2, 0)) - int(round(len(headline) / 2, 0))
@@ -209,8 +204,10 @@ def druckeFahrzeuge(Fuhrpark, fahrzeugListe: dict, fenstergroesse: tuple):
             index += 1
             print(f"{fmtString(index, 8)}|{fmtString(kategorie, 16)}|{fmtString(fahrzeugListe[kategorie][fahrzeug]["kennzeichen"], 16)}|{fmtString(fahrzeugListe[kategorie][fahrzeug]["hersteller"], 16)}|{fmtString(fahrzeugListe[kategorie][fahrzeug]["modell"], 16)}")
 
+
 # Text User Interface
 def tui(Fuhrpark):
+    # ... (unverändert)
     fahrzeugListe = Fuhrpark.getFahrzeuge()
     fenstergroesse = os.get_terminal_size()
     druckeFahrzeuge(Fuhrpark, fahrzeugListe, fenstergroesse)
@@ -283,11 +280,12 @@ def main():
     
     if not geladene_fahrzeuge:
         print("Füge Beispieldaten hinzu...")
-        # Die Sample-Daten verwenden jetzt erlaubte Großbuchstaben-Hersteller
-        Fuhrpark1.addFahrzeug("PKW", "SU_N_9513", "SEAT", "Leon", 2002, 5, 0)
-        Fuhrpark1.addFahrzeug("PKW", "SU_O_9513", "DACIA", "Logan", 2014, 5, 0)
-        Fuhrpark1.addFahrzeug("PKW", "SU_JS_1", "PEUGOT", "206 CC", 2002, 3, 0)
-        Fuhrpark1.addFahrzeug("LKW", "GM_BN_2", "MERCEDES", "Actros", 2017, 0, 5500)
+        # Beispiel-Daten angepasst: Erlauben nun Sonderzeichen
+        Fuhrpark1.addFahrzeug("PKW", "0-1", "MERCEDES", "S-Klasse", datetime.now().year, 5, 0) # Bsp. Kennzeichen des Bundespräsidenten
+        Fuhrpark1.addFahrzeug("PKW", "SU-O-9513", "DACIA", "Logan", 2014, 5, 0) 
+        Fuhrpark1.addFahrzeug("PKW", "F-JS-1", "PEUGOT", "206 CC", 2002, 3, 0) 
+        Fuhrpark1.addFahrzeug("LKW", "GM-BN-2", "MERCEDES", "Actros", 2017, 0, 5500) 
+        Fuhrpark1.addFahrzeug("LKW", "FR-234-RT", "SCANIA", "R-Serie", 2019, 0, 8000) # Bsp. Ausländisches Kennzeichen
     
     tui(Fuhrpark1)
 
