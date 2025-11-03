@@ -170,7 +170,7 @@ def tui(Fuhrpark):
     druckeFahrzeuge(Fuhrpark, fahrzeugListe, fenstergroesse)
     while True:
         # Menüoption 's' zum Speichern hinzugefügt
-        eingabe = input("\np - PKW hinzufügen\nl - LKW hinzufügen\nd - Details zu Fahrzeug anzeigen\ni - Details zu Fahrzeug nach Index anzeigen\nr - Fahrzeug entfernen\ns - Fuhrpark speichern\nq - Programm verlassen\n\nBitte Kommando angeben: ")
+        eingabe = input("\np - PKW hinzufügen\nl - LKW hinzufügen\nd - Details zu Fahrzeug anzeigen\ni - Details zu Fahrzeug nach Index anzeigen\nr - Fahrzeug entfernen\nq - Programm verlassen\n\nBitte Kommando angeben: ")
         if eingabe == "p":
             eingabeKennzeichen = eingabeCheck("Bitte Kennzeichen angeben: ", str)
             eingabeHersteller = eingabeCheck("Bitte Hersteller angeben: ", str)
