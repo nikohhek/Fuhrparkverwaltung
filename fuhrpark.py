@@ -1,14 +1,28 @@
 import os
-# Importiere das pickle-Modul für das Speichern/Laden von Objekten
 import pickle
+from datetime import datetime
 
 # Konstanter Dateiname für das Speichern
 DATEINAME = "fuhrparkdaten.pkl"
 
+# NEUE, ERWEITERTE LISTE: Erlaubte Hersteller (PKW, LKW, Transporter, inkl. Chinesischer Hersteller)
+ERLAUBTE_HERSTELLER = [
+    "ACURA", "ALFA ROMEO", "ASTON MARTIN", "AUDI", "BENTLEY", "BMW", "BUGATTI", 
+    "BUICK", "BYD", "CADILLAC", "CHEVROLET", "CHRYSLER", "CITROEN", "DACIA", "DAF", 
+    "DAIHATSU", "DODGE", "DS", "FAW", "FERRARI", "FIAT", "FORD", "FREIGHTLINER", 
+    "GEELY", "GENESIS", "GMC", "GREAT WALL", "HONDA", "HUMMER", "HYUNDAI", 
+    "INFINITI", "ISUZU", "IVECO", "JAC", "JAGUAR", "JEEP", "KAMAZ", "KENWORTH", 
+    "KIA", "LAMBORGHINI", "LAND ROVER", "LI AUTO", "LEXUS", "LINCOLN", "LOTUS", 
+    "MAN", "MASERATI", "MAZDA", "MCLAREN", "MERCEDES", "MG", "MINI", "MITSUBISHI", 
+    "MITSUBISHI FUSO", "NIO", "NISSAN", "OPEL", "PEUGOT", "PETERBILT", "POLESTAR", 
+    "PORSCHE", "QOROS", "RAM", "RENAULT", "RENAULT TRUCKS", "ROLLS-ROYCE", "SAAB", 
+    "SCANIA", "SEAT", "SKODA", "SMART", "SUBARU", "SUZUKI", "TATA", "TESLA", 
+    "TOYOTA", "VAUXHALL", "VOLVO", "VW", "XPENG", "ZEEKR"
+]
+
 
 class Fahrzeug:
     def __init__(self, kennzeichen: str, hersteller: str, modell: str, baujahr: int):
-        # Das '__slots__' Attribut wurde nicht verwendet, also wird das Standard-Attribut-Speichersystem beibehalten
         self.__kennzeichen = kennzeichen
         self.__hersteller = hersteller
         self.__modell = modell
@@ -32,7 +46,7 @@ class PKW(Fahrzeug):
         super().__init__(kennzeichen, hersteller, modell, baujahr)
         self.__anzahlTueren = anzahlTueren
 
-    def getAnzahlTueren(self) -> int: # Korrigiere den Rückgabetyp zu int, wie in der Logik verwendet
+    def getAnzahlTueren(self) -> int:
         return self.__anzahlTueren
 
 
@@ -75,36 +89,48 @@ class Fuhrpark:
         return fahrzeugListe
 
     def addFahrzeug(self, fahrzeugtyp: str, kennzeichen: str, hersteller: str, modell: str, baujahr: int, anzahlTueren: int, ladekapazitaetKG: int):
+        # Prüfung auf Duplikat
         for fahrzeug in self.__fahrzeuge:
             if fahrzeug.getKennzeichen() == kennzeichen:
                 print(f"Fahrzeug mit Kennzeichen {kennzeichen} ist bereits gepflegt.")
                 return
+        
+        # Prüfung auf Hersteller (nur als zusätzliche Sicherung)
+        if hersteller.upper() not in ERLAUBTE_HERSTELLER:
+             print(f"Hersteller '{hersteller}' ist nicht in der Liste der erlaubten Hersteller.")
+             return
+
         if fahrzeugtyp == "PKW":
             self.__fahrzeuge.append(PKW(kennzeichen, hersteller, modell, baujahr, anzahlTueren))
             print("PKW erstellt")
         if fahrzeugtyp == "LKW":
             self.__fahrzeuge.append(LKW(kennzeichen, hersteller, modell, baujahr, ladekapazitaetKG))
             print("LKW erstellt")
+        
+        # Automatisch speichern
+        self.speichereFuhrpark()
 
+    # Entfernt ein Fahrzeug anhand des Kennzeichens
     def removeFahrzeug(self, kennzeichen: str):
         original_laenge = len(self.__fahrzeuge)
         self.__fahrzeuge = [fahrzeug for fahrzeug in self.__fahrzeuge if fahrzeug.getKennzeichen().upper() != kennzeichen.upper()]
         
         if len(self.__fahrzeuge) < original_laenge:
             print(f"Fahrzeug mit Kennzeichen {kennzeichen} erfolgreich entfernt.")
+            # Automatisch speichern
+            self.speichereFuhrpark()
         else:
             print(f"Fahrzeug mit Kennzeichen {kennzeichen} nicht gefunden.")
 
-    # NEUE FUNKTION: Speichert den gesamten Fuhrpark-Objektstatus
+    # Speichert den gesamten Fuhrpark-Objektstatus
     def speichereFuhrpark(self, dateiname: str = DATEINAME):
         try:
             with open(dateiname, 'wb') as datei:
                 pickle.dump(self.__fahrzeuge, datei)
-            print(f"Daten erfolgreich in '{dateiname}' gespeichert.")
         except Exception as e:
             print(f"Fehler beim Speichern der Daten: {e}")
 
-    # NEUE FUNKTION: Lädt den Fuhrpark-Objektstatus und gibt ihn zurück
+    # Lädt den Fuhrpark-Objektstatus und gibt ihn zurück
     @staticmethod
     def ladeFuhrpark(dateiname: str = DATEINAME) -> list:
         if os.path.exists(dateiname):
@@ -140,13 +166,33 @@ def fmtString(String: str, laenge: int) -> str:
     return fmt
 
 def eingabeCheck(eingabe: str, typ):
+    aktuelles_jahr = datetime.now().year 
+
     while True:
         try:
             checked = typ(input(eingabe))
+            
             if typ == str and checked == "":
                 print("Eingabe leer. Bitte erneut eingeben.")
-            else:
-                break
+                continue 
+            
+            # Baujahr-Prüfung
+            if typ == int and "baujahr" in eingabe.lower() and checked > aktuelles_jahr:
+                print(f"Ungültiges Baujahr. Das Jahr darf nicht über {aktuelles_jahr} liegen.")
+                continue
+
+            # Herstellerprüfung
+            if typ == str and "hersteller" in eingabe.lower():
+                # Die Eingabe muss zuerst in Großbuchstaben umgewandelt werden, um sie mit der Liste abzugleichen
+                if checked.upper() not in ERLAUBTE_HERSTELLER:
+                    print(f"Hersteller '{checked}' ist nicht in der erlaubten Liste.")
+                    # Zeigt die ersten 10 Hersteller zur Orientierung
+                    print(f"Erlaubte Hersteller (Auszug): {', '.join(sorted(ERLAUBTE_HERSTELLER)[:10])}...")
+                    continue
+                # Konvertiere den Hersteller zur Speicherung in Großbuchstaben (Style-Anpassung)
+                checked = checked.upper() 
+
+            break 
         except:
             print("Ungültige Eingabe. Bitte erneut eingeben.")
     return checked
@@ -169,7 +215,6 @@ def tui(Fuhrpark):
     fenstergroesse = os.get_terminal_size()
     druckeFahrzeuge(Fuhrpark, fahrzeugListe, fenstergroesse)
     while True:
-        # Menüoption 's' zum Speichern hinzugefügt
         eingabe = input("\np - PKW hinzufügen\nl - LKW hinzufügen\nd - Details zu Fahrzeug anzeigen\ni - Details zu Fahrzeug nach Index anzeigen\nr - Fahrzeug entfernen\nq - Programm verlassen\n\nBitte Kommando angeben: ")
         if eingabe == "p":
             eingabeKennzeichen = eingabeCheck("Bitte Kennzeichen angeben: ", str)
@@ -178,7 +223,6 @@ def tui(Fuhrpark):
             eingabeBaujahr = eingabeCheck("Bitte das Baujahr angeben: ", int)
             eingabeAnzahlTueren = eingabeCheck("Bitte Anzahl der Türen angeben: ", int)
             Fuhrpark.addFahrzeug("PKW", eingabeKennzeichen, eingabeHersteller, eingabeModell, eingabeBaujahr, eingabeAnzahlTueren, 0)
-            Fuhrpark.speichereFuhrpark()
             break
         elif eingabe == "l":
             eingabeKennzeichen = eingabeCheck("Bitte Kennzeichen angeben: ", str)
@@ -187,12 +231,10 @@ def tui(Fuhrpark):
             eingabeBaujahr = eingabeCheck("Bitte das Baujahr angeben: ", int)
             eingabeLadekapazitaetKG = eingabeCheck("Bitte Ladekapazität in Kilogramm angeben: ", int)
             Fuhrpark.addFahrzeug("LKW", eingabeKennzeichen, eingabeHersteller, eingabeModell, eingabeBaujahr, 0, eingabeLadekapazitaetKG)
-            Fuhrpark.speichereFuhrpark()
             break
         elif eingabe == "r":
             eingabeKennzeichen = eingabeCheck("Bitte Kennzeichen des zu entfernenden Fahrzeugs angeben: ", str)
             Fuhrpark.removeFahrzeug(eingabeKennzeichen)
-            Fuhrpark.speichereFuhrpark()
             input("\nDrücke Return um fortzufahren...")
             break
         elif eingabe == "q":
@@ -236,18 +278,16 @@ def tui(Fuhrpark):
     tui(Fuhrpark)
 
 def main():
-    # 1. NEUE LOGIK: Versuche, Daten zu laden
     geladene_fahrzeuge = Fuhrpark.ladeFuhrpark()
-    # 2. Initiierung von Fuhrpark-Objekt zur Verwaltung mit geladenen oder leeren Daten
     Fuhrpark1 = Fuhrpark(geladene_fahrzeuge)
     
-    # NEUE LOGIK: Füge Samples nur hinzu, wenn keine Daten geladen wurden
     if not geladene_fahrzeuge:
         print("Füge Beispieldaten hinzu...")
-        Fuhrpark1.addFahrzeug("PKW", "SU_N_9513", "Seat", "Leon", 2002, 5, 0)
-        Fuhrpark1.addFahrzeug("PKW", "SU_O_9513", "Dacia", "Logan", 2014, 5, 0)
-        Fuhrpark1.addFahrzeug("PKW", "SU_JS_1", "Peugot", "206 CC", 2002, 3, 0)
-        Fuhrpark1.addFahrzeug("LKW", "GM_BN_2", "Mercedes", "Actros", 2017, 0, 5500)
+        # Die Sample-Daten verwenden jetzt erlaubte Großbuchstaben-Hersteller
+        Fuhrpark1.addFahrzeug("PKW", "SU_N_9513", "SEAT", "Leon", 2002, 5, 0)
+        Fuhrpark1.addFahrzeug("PKW", "SU_O_9513", "DACIA", "Logan", 2014, 5, 0)
+        Fuhrpark1.addFahrzeug("PKW", "SU_JS_1", "PEUGOT", "206 CC", 2002, 3, 0)
+        Fuhrpark1.addFahrzeug("LKW", "GM_BN_2", "MERCEDES", "Actros", 2017, 0, 5500)
     
     tui(Fuhrpark1)
 
