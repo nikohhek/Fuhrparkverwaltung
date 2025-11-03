@@ -1,12 +1,13 @@
 import os
 import pickle
 from datetime import datetime
-# re-Import entfernt, da die strenge Regex-Prüfung entfällt
+import tkinter as tk
+from tkinter import ttk, messagebox # Für moderne Widgets und Dialoge
 
 # Konstanter Dateiname für das Speichern
 DATEINAME = "fuhrparkdaten.pkl"
 
-# Erlaubte Hersteller Liste bleibt unverändert (hier aus Platzgründen ausgeklammert)
+# Erlaubte Hersteller Liste bleibt unverändert (hier verkürzt zur Übersicht)
 ERLAUBTE_HERSTELLER = [
     "ACURA", "ALFA ROMEO", "ASTON MARTIN", "AUDI", "BENTLEY", "BMW", "BUGATTI", 
     "BUICK", "BYD", "CADILLAC", "CHEVROLET", "CHRYSLER", "CITROEN", "DACIA", "DAF", 
@@ -22,8 +23,9 @@ ERLAUBTE_HERSTELLER = [
 ]
 
 
+# --- KLASSEN FÜR DATENSTRUKTUR (Unverändert) ---
+
 class Fahrzeug:
-    # ... (Klassen bleiben unverändert)
     def __init__(self, kennzeichen: str, hersteller: str, modell: str, baujahr: int):
         self.__kennzeichen = kennzeichen
         self.__hersteller = hersteller
@@ -33,83 +35,82 @@ class Fahrzeug:
     def getKennzeichen(self) -> str:
         return self.__kennzeichen
 
-    # ... (Getter bleiben unverändert)
+    def getHersteller(self) -> str:
+        return self.__hersteller
 
+    def getModell(self) -> str:
+        return self.__modell
+
+    def getBaujahr(self) -> int:
+        return self.__baujahr
 
 class PKW(Fahrzeug):
     def __init__(self, kennzeichen: str, hersteller: str, modell: str, baujahr: int, anzahlTueren: int):
         super().__init__(kennzeichen, hersteller, modell, baujahr)
         self.__anzahlTueren = anzahlTueren
-    # ...
 
+    def getAnzahlTueren(self) -> int:
+        return self.__anzahlTueren
 
 class LKW(Fahrzeug):
     def __init__(self, kennzeichen: str, hersteller: str, modell: str, baujahr: int, ladekapazitaetKG: int):
         super().__init__(kennzeichen, hersteller, modell, baujahr)
         self.__ladekapazitaetKG = ladekapazitaetKG
-    # ...
 
+    def getLadekapazitaetKG(self) -> int:
+        return self.__ladekapazitaetKG
+
+# --- KLASSE FUHRPARK (Unverändert, inkl. Autosave) ---
 
 class Fuhrpark:
     def __init__(self, fahrzeuge: list):
         self.__fahrzeuge = fahrzeuge
 
-    # ... (Methoden getFahrzeuge, addFahrzeug, removeFahrzeug, speichereFuhrpark, ladeFuhrpark bleiben unverändert)
-
     def getFahrzeuge(self) -> dict:
-        fahrzeugListe = {
-            "PKW": {},
-            "LKW": {}
-        }
+        fahrzeugListe = {"PKW": {}, "LKW": {}}
         for fahrzeug in self.__fahrzeuge:
+            kennzeichen = fahrzeug.getKennzeichen()
+            base_data = {
+                "kennzeichen": kennzeichen,
+                "hersteller": fahrzeug.getHersteller(),
+                "modell": fahrzeug.getModell(),
+                "baujahr": fahrzeug.getBaujahr(),
+            }
             if type(fahrzeug).__name__ == "PKW":
-                fahrzeugListe["PKW"][fahrzeug.getKennzeichen()] = {
-                    "kennzeichen": fahrzeug.getKennzeichen(),
-                    "hersteller": fahrzeug.getHersteller(),
-                    "modell": fahrzeug.getModell(),
-                    "baujahr": fahrzeug.getBaujahr(),
-                    "anzahlTueren": fahrzeug.getAnzahlTueren()
-                }
+                fahrzeugListe["PKW"][kennzeichen] = {**base_data, "anzahlTueren": fahrzeug.getAnzahlTueren()}
             if type(fahrzeug).__name__ == "LKW":
-                fahrzeugListe["LKW"][fahrzeug.getKennzeichen()] = {
-                    "kennzeichen": fahrzeug.getKennzeichen(),
-                    "hersteller": fahrzeug.getHersteller(),
-                    "modell": fahrzeug.getModell(),
-                    "baujahr": fahrzeug.getBaujahr(),
-                    "ladekapazitaetKG": fahrzeug.getLadekapazitaetKG()
-                }
+                fahrzeugListe["LKW"][kennzeichen] = {**base_data, "ladekapazitaetKG": fahrzeug.getLadekapazitaetKG()}
         return fahrzeugListe
 
     def addFahrzeug(self, fahrzeugtyp: str, kennzeichen: str, hersteller: str, modell: str, baujahr: int, anzahlTueren: int, ladekapazitaetKG: int):
-        # Prüfung auf Duplikat
         for fahrzeug in self.__fahrzeuge:
             if fahrzeug.getKennzeichen() == kennzeichen:
-                print(f"Fahrzeug mit Kennzeichen {kennzeichen} ist bereits gepflegt.")
-                return
+                return f"Fahrzeug mit Kennzeichen {kennzeichen} ist bereits gepflegt."
         
-        # Prüfung auf Hersteller
         if hersteller.upper() not in ERLAUBTE_HERSTELLER:
-             print(f"Hersteller '{hersteller}' ist nicht in der Liste der erlaubten Hersteller.")
-             return
+             return f"Hersteller '{hersteller}' ist nicht in der Liste der erlaubten Hersteller."
 
         if fahrzeugtyp == "PKW":
             self.__fahrzeuge.append(PKW(kennzeichen, hersteller, modell, baujahr, anzahlTueren))
-            print("PKW erstellt")
-        if fahrzeugtyp == "LKW":
+            result = "PKW erstellt"
+        elif fahrzeugtyp == "LKW":
             self.__fahrzeuge.append(LKW(kennzeichen, hersteller, modell, baujahr, ladekapazitaetKG))
-            print("LKW erstellt")
+            result = "LKW erstellt"
+        else:
+            return "Ungültiger Fahrzeugtyp."
         
         self.speichereFuhrpark()
+        return result
 
     def removeFahrzeug(self, kennzeichen: str):
         original_laenge = len(self.__fahrzeuge)
         self.__fahrzeuge = [fahrzeug for fahrzeug in self.__fahrzeuge if fahrzeug.getKennzeichen().upper() != kennzeichen.upper()]
         
         if len(self.__fahrzeuge) < original_laenge:
-            print(f"Fahrzeug mit Kennzeichen {kennzeichen} erfolgreich entfernt.")
             self.speichereFuhrpark()
+            return f"Fahrzeug mit Kennzeichen {kennzeichen} erfolgreich entfernt."
         else:
-            print(f"Fahrzeug mit Kennzeichen {kennzeichen} nicht gefunden.")
+            return f"Fahrzeug mit Kennzeichen {kennzeichen} nicht gefunden."
 
     def speichereFuhrpark(self, dateiname: str = DATEINAME):
         try:
@@ -133,161 +134,131 @@ class Fuhrpark:
             print(f"Speicherdatei '{dateiname}' nicht gefunden. Starte mit leerem Fuhrpark.")
             return []
 
+# --- VALIDIERUNGSFUNKTION (Für die GUI angepasst) ---
 
-def fmtString(String: str, laenge: int) -> str:
-    # ... (unverändert)
-    String = str(String)
-    if len(String) > laenge - 1:
-        counter = 0
-        newString = ""
-        for character in String:
-            counter += 1
-            if counter < 12:
-                newString += character
-            elif counter >= 12 and counter < 15:
-                newString += "."
-            else:
-                String = newString
-                break
-    margin = int(laenge - round(len(String) , 0) - 1)
-    fmt = str(" " + String + margin * " ")
-    return fmt
-
-def eingabeCheck(eingabe: str, typ):
+def eingabeCheck_GUI(eingabe_wert: str, feld_typ: str) -> tuple[bool, str]:
+    """Prüft die Eingabe für die GUI-Formulare."""
     aktuelles_jahr = datetime.now().year 
 
-    while True:
+    if feld_typ == "baujahr":
         try:
-            checked = typ(input(eingabe))
+            jahr = int(eingabe_wert)
+            if jahr > aktuelles_jahr:
+                return False, f"Baujahr darf nicht über {aktuelles_jahr} liegen."
+            return True, ""
+        except ValueError:
+            return False, "Baujahr muss eine ganze Zahl sein."
+
+    elif feld_typ == "kennzeichen":
+        checked = eingabe_wert.upper().strip() 
+        if checked == "":
+            return False, "Kennzeichen darf nicht leer sein."
+        return True, checked # Gibt den bereinigten (upper) Wert zurück
+
+    elif feld_typ == "hersteller":
+        checked = eingabe_wert.upper().strip()
+        if checked not in ERLAUBTE_HERSTELLER:
+            return False, f"Hersteller '{eingabe_wert}' ist nicht erlaubt."
+        return True, checked # Gibt den bereinigten (upper) Wert zurück
+
+    elif feld_typ in ("anzahlTueren", "ladekapazitaetKG"):
+        try:
+            wert = int(eingabe_wert)
+            if wert < 0:
+                 return False, "Wert muss positiv sein."
+            return True, wert
+        except ValueError:
+            return False, "Eingabe muss eine ganze Zahl sein."
             
-            if typ == str and checked == "":
-                print("Eingabe leer. Bitte erneut eingeben.")
-                continue 
+    return True, eingabe_wert
+
+# --- TKINTER GUI KLASSE ---
+
+class FuhrparkGUI:
+    def __init__(self, master, fuhrpark):
+        self.master = master
+        master.title("Fuhrpark-Management")
+        self.fuhrpark = fuhrpark
+
+        # Stil (Optional, macht die GUI hübscher)
+        style = ttk.Style()
+        style.configure("TFrame", background="#f0f0f0")
+        style.configure("TButton", padding=6, relief="flat", background="#ccc")
+
+        # --- Frames ---
+        self.main_frame = ttk.Frame(master, padding="10")
+        self.main_frame.pack(fill='both', expand=True)
+
+        self.list_frame = ttk.Frame(self.main_frame)
+        self.list_frame.pack(side="left", fill="both", expand=True, padx=5, pady=5)
+
+        self.control_frame = ttk.Frame(self.main_frame, padding="10", relief="groove")
+        self.control_frame.pack(side="right", fill="y", padx=5, pady=5)
+
+        # --- Liste / Treeview ---
+        self.setup_list_view()
+        self.update_list()
+        
+        # --- Steuerung/Formular ---
+        self.setup_control_panel()
+
+    def setup_list_view(self):
+        # Treeview (Tabelle) erstellen
+        columns = ("Index", "Typ", "Kennzeichen", "Hersteller", "Modell", "Baujahr", "Details")
+        self.tree = ttk.Treeview(self.list_frame, columns=columns, show='headings')
+
+        for col in columns:
+            self.tree.heading(col, text=col, command=lambda c=col: self.sort_column(self.tree, c, False))
+            self.tree.column(col, anchor="w", width=80 if col in ("Typ", "Baujahr") else 100)
             
-            # KENNZEICHEN PRÜFUNG (Gelockert)
-            if typ == str and "kennzeichen" in eingabe.lower():
-                # Wir stellen nur sicher, dass es Großbuchstaben sind und keine reine Leer-Eingabe
-                checked = checked.upper().strip() 
-                if checked == "":
-                    print("Kennzeichen darf nicht leer sein.")
-                    continue
-                # ACHTUNG: Die strenge re.match Prüfung entfällt hier!
+        self.tree.pack(side="top", fill="both", expand=True)
+
+        # Scrollbar hinzufügen
+        vsb = ttk.Scrollbar(self.list_frame, orient="vertical", command=self.tree.yview)
+        vsb.pack(side='right', fill='y')
+        self.tree.configure(yscrollcommand=vsb.set)
+        
+        # Event für Doppelklick zur Detailanzeige
+        self.tree.bind('<Double-1>', self.show_details)
+
+
+    def setup_control_panel(self):
+        ttk.Label(self.control_frame, text="Fahrzeug hinzufügen/entfernen", font=("Arial", 12, "bold")).pack(pady=10)
+
+        # Variablen für die Eingabefelder
+        self.vars = {
+            "typ": tk.StringVar(value="PKW"),
+            "kennzeichen": tk.StringVar(),
+            "hersteller": tk.StringVar(),
+            "modell": tk.StringVar(),
+            "baujahr": tk.StringVar(),
+            "anzahlTueren": tk.StringVar(),
+            "ladekapazitaetKG": tk.StringVar()
+        }
+
+        # Eingabefelder erstellen
+        fields = [
+            ("Typ:", ttk.Combobox, "typ", ["PKW", "LKW"]),
+            ("Kennzeichen:", ttk.Entry, "kennzeichen"),
+            ("Hersteller:", ttk.Entry, "hersteller"),
+            ("Modell:", ttk.Entry, "modell"),
+            ("Baujahr:", ttk.Entry, "baujahr"),
+            ("Anzahl Türen (PKW):", ttk.Entry, "anzahlTueren"),
+            ("Ladekapazität (LKW):", ttk.Entry, "ladekapazitaetKG")
+        ]
+
+        for label_text, widget_type, var_name, *options in fields:
+            row = ttk.Frame(self.control_frame)
+            row.pack(fill='x', pady=2)
+            ttk.Label(row, text=label_text, width=15, anchor='w').pack(side='left')
             
-            # Baujahr-Prüfung
-            if typ == int and "baujahr" in eingabe.lower() and checked > aktuelles_jahr:
-                print(f"Ungültiges Baujahr. Das Jahr darf nicht über {aktuelles_jahr} liegen.")
-                continue
-
-            # Herstellerprüfung
-            if typ == str and "hersteller" in eingabe.lower():
-                if checked.upper() not in ERLAUBTE_HERSTELLER:
-                    print(f"Hersteller '{checked}' ist nicht in der erlaubten Liste.")
-                    print(f"Erlaubte Hersteller (Auszug): {', '.join(sorted(ERLAUBTE_HERSTELLER)[:10])}...")
-                    continue
-                checked = checked.upper() 
-
-            break 
-        except:
-            print("Ungültige Eingabe. Bitte erneut eingeben.")
-    return checked
-
-def druckeFahrzeuge(Fuhrpark, fahrzeugListe: dict, fenstergroesse: tuple):
-    # ... (unverändert)
-    index = 0
-    headline = "Fahrzeuge"
-    headlineMargin = int(round(fenstergroesse.columns / 2, 0)) - int(round(len(headline) / 2, 0))
-    print(f"\n{fenstergroesse.columns * "="}\n{headlineMargin * " "}Fahrzeuge\n{fenstergroesse.columns * "="}")
-    # Bezeichnungen Tabelle
-    print(f"{fmtString("INDEX", 8)}|{fmtString("TYP", 16)}|{fmtString("KENNZEICHEN", 16)}|{fmtString("HERSTELLER", 16)}|{fmtString("MODELL", 16)}\n{fenstergroesse.columns * "-"}")
-    for kategorie in fahrzeugListe:
-        for fahrzeug in fahrzeugListe[kategorie]:
-            index += 1
-            print(f"{fmtString(index, 8)}|{fmtString(kategorie, 16)}|{fmtString(fahrzeugListe[kategorie][fahrzeug]["kennzeichen"], 16)}|{fmtString(fahrzeugListe[kategorie][fahrzeug]["hersteller"], 16)}|{fmtString(fahrzeugListe[kategorie][fahrzeug]["modell"], 16)}")
-
-
-# Text User Interface
-def tui(Fuhrpark):
-    # ... (unverändert)
-    fahrzeugListe = Fuhrpark.getFahrzeuge()
-    fenstergroesse = os.get_terminal_size()
-    druckeFahrzeuge(Fuhrpark, fahrzeugListe, fenstergroesse)
-    while True:
-        eingabe = input("\np - PKW hinzufügen\nl - LKW hinzufügen\nd - Details zu Fahrzeug anzeigen\ni - Details zu Fahrzeug nach Index anzeigen\nr - Fahrzeug entfernen\nq - Programm verlassen\n\nBitte Kommando angeben: ")
-        if eingabe == "p":
-            eingabeKennzeichen = eingabeCheck("Bitte Kennzeichen angeben: ", str)
-            eingabeHersteller = eingabeCheck("Bitte Hersteller angeben: ", str)
-            eingabeModell = eingabeCheck("Bitte Modell angeben: ", str)
-            eingabeBaujahr = eingabeCheck("Bitte das Baujahr angeben: ", int)
-            eingabeAnzahlTueren = eingabeCheck("Bitte Anzahl der Türen angeben: ", int)
-            Fuhrpark.addFahrzeug("PKW", eingabeKennzeichen, eingabeHersteller, eingabeModell, eingabeBaujahr, eingabeAnzahlTueren, 0)
-            break
-        elif eingabe == "l":
-            eingabeKennzeichen = eingabeCheck("Bitte Kennzeichen angeben: ", str)
-            eingabeHersteller = eingabeCheck("Bitte Hersteller angeben: ", str)
-            eingabeModell = eingabeCheck("Bitte Modell angeben: ", str)
-            eingabeBaujahr = eingabeCheck("Bitte das Baujahr angeben: ", int)
-            eingabeLadekapazitaetKG = eingabeCheck("Bitte Ladekapazität in Kilogramm angeben: ", int)
-            Fuhrpark.addFahrzeug("LKW", eingabeKennzeichen, eingabeHersteller, eingabeModell, eingabeBaujahr, 0, eingabeLadekapazitaetKG)
-            break
-        elif eingabe == "r":
-            eingabeKennzeichen = eingabeCheck("Bitte Kennzeichen des zu entfernenden Fahrzeugs angeben: ", str)
-            Fuhrpark.removeFahrzeug(eingabeKennzeichen)
-            input("\nDrücke Return um fortzufahren...")
-            break
-        elif eingabe == "q":
-            return
-        elif eingabe == "d":
-            suche = eingabeCheck("Kennzeichen auswählen: ", str)
-            try:
-                print(f"\nTyp: PKW\nKennzeichen: {fahrzeugListe["PKW"][suche]["kennzeichen"]}\nHersteller: {fahrzeugListe["PKW"][suche]["hersteller"]}\nModell: {fahrzeugListe["PKW"][suche]["modell"]}\nBaujahr: {fahrzeugListe["PKW"][suche]["baujahr"]}\nAnzahl der Tühren: {fahrzeugListe["PKW"][suche]["anzahlTueren"]}")
-            except:
-                try:
-                    print(f"\nTyp: LKW\nKennzeichen: {fahrzeugListe["LKW"][suche]["kennzeichen"]}\nHersteller: {fahrzeugListe["LKW"][suche]["hersteller"]}\nModell: {fahrzeugListe["LKW"][suche]["modell"]}\nBaujahr: {fahrzeugListe["LKW"][suche]["baujahr"]}\nLadekapazität: {fahrzeugListe["LKW"][suche]["ladekapazitaetKG"]} kg")
-                except:
-                    print("Kennzeichen nicht gefunden. Bitte Eingabe prüfen.")
-            input("\nDrücke Return um fortzufahren...")
-            break
-        elif eingabe == "i":
-            index = 0
-            suche = ""
-            suchNr = eingabeCheck("Index angeben: ", int)
-            for kategorie in fahrzeugListe:
-                for fahrzeug in fahrzeugListe[kategorie]:
-                    index += 1
-                    if index == suchNr:
-                        suche = fahrzeugListe[kategorie][fahrzeug]["kennzeichen"]
-            if suche == "":
-                print("Index nicht gefunden.")
-                input("\nDrücke Return um fortzufahren...")
-                break
+            if widget_type == ttk.Combobox:
+                widget = widget_type(row, textvariable=self.vars[var_name], values=options[0], state="readonly")
             else:
-                try:
-                    print(f"\nTyp: PKW\nKennzeichen: {fahrzeugListe["PKW"][suche]["kennzeichen"]}\nHersteller: {fahrzeugListe["PKW"][suche]["hersteller"]}\nModell: {fahrzeugListe["PKW"][suche]["modell"]}\nBaujahr: {fahrzeugListe["PKW"][suche]["baujahr"]}\nAnzahl der Tühren: {fahrzeugListe["PKW"][suche]["anzahlTueren"]}")
-                except:
-                    try:
-                        print(f"\nTyp: LKW\nKennzeichen: {fahrzeugListe["LKW"][suche]["kennzeichen"]}\nHersteller: {fahrzeugListe["LKW"][suche]["hersteller"]}\nModell: {fahrzeugListe["LKW"][suche]["modell"]}\nBaujahr: {fahrzeugListe["LKW"][suche]["baujahr"]}\nLadekapazität: {fahrzeugListe["LKW"][suche]["ladekapazitaetKG"]} kg")
-                    except:
-                        print("Kennzeichen nicht gefunden. Bitte Eingabe prüfen.")
-                input("\nDrücke Return um fortzufahren...")
-                break
-        else:
-            print("Ungültige Eingabe. Bitte erneut eingeben.\n")
-    tui(Fuhrpark)
-
-def main():
-    geladene_fahrzeuge = Fuhrpark.ladeFuhrpark()
-    Fuhrpark1 = Fuhrpark(geladene_fahrzeuge)
-    
-    if not geladene_fahrzeuge:
-        print("Füge Beispieldaten hinzu...")
-        # Beispiel-Daten angepasst: Erlauben nun Sonderzeichen
-        Fuhrpark1.addFahrzeug("PKW", "0-1", "MERCEDES", "S-Klasse", datetime.now().year, 5, 0) # Bsp. Kennzeichen des Bundespräsidenten
-        Fuhrpark1.addFahrzeug("PKW", "SU-O-9513", "DACIA", "Logan", 2014, 5, 0) 
-        Fuhrpark1.addFahrzeug("PKW", "F-JS-1", "PEUGOT", "206 CC", 2002, 3, 0) 
-        Fuhrpark1.addFahrzeug("LKW", "GM-BN-2", "MERCEDES", "Actros", 2017, 0, 5500) 
-        Fuhrpark1.addFahrzeug("LKW", "FR-234-RT", "SCANIA", "R-Serie", 2019, 0, 8000) # Bsp. Ausländisches Kennzeichen
-    
-    tui(Fuhrpark1)
-
-if __name__ == "__main__":
-    main()
+                widget = widget_type(row, textvariable=self.vars[var_name])
+            widget.pack(side='right', expand=True, fill='x')
+        
+        # Schaltflächen
+        ttk.Button(self.control_frame, text="Fahrzeug HINZUFÜGEN", command=self.add_fahrzeug).pack(fill='x', pady=10)
+        
+        ttk.Separator(self.control_frame).pack(fill='x', pady=10)
